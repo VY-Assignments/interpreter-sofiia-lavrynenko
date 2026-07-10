@@ -1,0 +1,10 @@
+# Скомпільовані файли C++
+program
+*.o
+*.out
+
+# Системні файли macOS
+.DS_Store
+
+# Налаштування VS Code
+.vscode/
