@@ -1,3 +1,6 @@
+#ifndef NODE_H
+#define NODE_H
+
 #include <string>
 
 class Node
@@ -34,3 +37,5 @@ class OperatorNode : public Node
         double evaluate() override;
         void print() override;
 };
+
+#endif
