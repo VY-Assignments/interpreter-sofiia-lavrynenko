@@ -2,12 +2,12 @@
 #define NODE_H
 
 #include <string>
+#include <map>
 
 class Node
 {
     public:
-        virtual double evaluate() = 0;
-        virtual void print() = 0;
+        virtual double evaluate(std::map<std::string, double>& userSymbols) = 0;
 
         virtual ~Node() = default;
 };
@@ -20,8 +20,9 @@ class NumberNode : public Node
     public:
         NumberNode(double number);
         
-        double evaluate() override;
-        void print() override;
+        double evaluate(std::map<std::string, double>& userSymbols) override;
+
+        ~NumberNode() override;
 };
 
 class OperatorNode : public Node
@@ -34,8 +35,23 @@ class OperatorNode : public Node
     public:
         OperatorNode(Node* one, Node* two, std::string oper);
         
-        double evaluate() override;
-        void print() override;
+        double evaluate(std::map<std::string, double>& userSymbols) override;
+
+        ~OperatorNode() override;
+};
+
+class VariableNode : public Node
+{
+    private: 
+        std::string _name;
+        Node* _valueExpression;
+
+    public:
+        VariableNode(std::string name, Node* valueExpression);
+
+        double evaluate(std::map<std::string, double>& userSymbols) override;
+
+        ~VariableNode() override;
 };
 
 #endif

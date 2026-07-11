@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "node.h"
 #include "lexer.h"
@@ -8,6 +9,8 @@
 
 int main()
 {
+    std::map<std::string, double> userSymbols;
+
     std::string input;
 
     std::cout << "Welcome! \n";

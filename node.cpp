@@ -7,15 +7,12 @@ NumberNode::NumberNode(double number)
     _number = number;
 }
 
-double NumberNode::evaluate()
+double NumberNode::evaluate(std::map<std::string, double>& userSymbols)
 {
     return _number;
 }
 
-void NumberNode::print()
-{
-    std::cout << _number << "\n";
-}
+NumberNode::~NumberNode() {}
 
 OperatorNode::OperatorNode(Node* one, Node* two, std::string oper)
 {
@@ -24,10 +21,10 @@ OperatorNode::OperatorNode(Node* one, Node* two, std::string oper)
     _operator = oper;
 }
 
-double OperatorNode::evaluate()
+double OperatorNode::evaluate(std::map<std::string, double>& userSymbols)
 {
-    double oneValue = _one -> evaluate();
-    double twoValue = _two -> evaluate();
+    double oneValue = _one -> evaluate(userSymbols);
+    double twoValue = _two -> evaluate(userSymbols);
 
     if (_operator == "+")
     {
@@ -55,7 +52,26 @@ double OperatorNode::evaluate()
     return 0;
 }
 
-void OperatorNode::print()
+OperatorNode::~OperatorNode() 
 {
-    std::cout << _operator << "\n";
+    delete _one;
+    delete _two;
+}
+
+VariableNode::VariableNode(std::string name, Node* valueExpression)
+{
+    _name = name;
+    _valueExpression = valueExpression;
+}
+
+double VariableNode::evaluate(std::map<std::string, double>& userSymbols)
+{
+    double val = _valueExpression -> evaluate(userSymbols);
+    userSymbols[_name] = val;
+    return val;
+}
+
+VariableNode::~VariableNode()
+{
+    delete _valueExpression;
 }
