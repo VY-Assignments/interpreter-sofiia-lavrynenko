@@ -81,3 +81,20 @@ VariableNode::~VariableNode()
 {
     delete _valueExpression;
 }
+
+VariableForUseNode::VariableForUseNode(std::string name)
+{
+    _name = name;
+}
+
+double VariableForUseNode::evaluate(std::map<std::string, double>& userSymbols)
+{
+    if (userSymbols.find(_name) != userSymbols.end())
+    {
+        return userSymbols[_name];
+    }
+
+    std::cout << "Variable was not found. \n";
+
+    return 0;
+}

@@ -54,4 +54,17 @@ class VariableNode : public Node
         ~VariableNode() override;
 };
 
+class VariableForUseNode : public Node 
+{
+    private: 
+        std::string _name;
+
+    public: 
+        VariableForUseNode(std::string name);
+
+        double evaluate(std::map<std::string, double>& userSymbols) override;
+
+        ~VariableForUseNode() override = default; 
+};
+
 #endif

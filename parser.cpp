@@ -95,6 +95,11 @@ Node* Parser::parse_factor()
         return expression;
     }
 
+    if (match(TokenType::name))
+    {
+        return new VariableForUseNode(curr.value);
+    }
+
     return nullptr;
 }
 
