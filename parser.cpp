@@ -47,6 +47,32 @@ bool Parser::match(TokenType type)
     return false;
 }
 
+Node* Parser::parse_user_variables()
+{
+    if (match(TokenType::var))
+    {
+        Token nameT = peek();
+
+        if (!match(TokenType::name))
+        {
+            std::cout << "You need to give a name for the variable. \n";
+            return nullptr;
+        }
+
+        if (!match(TokenType::assign))
+        {
+            std::cout << "You need to type a '=' after the name. \n";
+            return nullptr;
+        }
+
+        Node* valueExpression = parse_plus_minus();
+
+        return new VariableNode(nameT.value, valueExpression);
+    }
+
+    return parse_plus_minus();
+}
+
 Node* Parser::parse_factor()
 {
     Token curr = peek();
@@ -104,5 +130,5 @@ Node* Parser::parse_plus_minus()
 
 Node* Parser::parse()
 {
-    return parse_plus_minus();
+    return parse_user_variables();
 }

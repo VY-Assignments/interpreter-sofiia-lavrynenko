@@ -66,6 +66,12 @@ VariableNode::VariableNode(std::string name, Node* valueExpression)
 
 double VariableNode::evaluate(std::map<std::string, double>& userSymbols)
 {
+    if (userSymbols.find(_name) != userSymbols.end())
+    {
+        std::cout << "Variable already exists. \n";
+        return userSymbols[_name];
+    }
+    
     double val = _valueExpression -> evaluate(userSymbols);
     userSymbols[_name] = val;
     return val;

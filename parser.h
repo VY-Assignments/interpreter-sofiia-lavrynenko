@@ -16,6 +16,8 @@ class Parser
         Token move_forward();
         bool match (TokenType type);
 
+        Node* parse_user_variables();
+
         Node* parse_plus_minus();
         Node* parse_multipl_divis();
         Node* parse_factor();

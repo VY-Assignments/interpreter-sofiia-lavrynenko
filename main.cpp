@@ -36,7 +36,7 @@ int main()
 
         if (root != nullptr)
         {
-            double res = root -> evaluate();
+            double res = root -> evaluate(userSymbols);
             std::cout << "Your result: " << res << "\n";
 
             delete root;
