@@ -88,6 +88,12 @@ std::vector<Token> Lexer::tokenize()
             move_forward();
         }
 
+        else if (curr == ',')
+        {
+            tokens.push_back({TokenType::comma, ","});
+            move_forward();
+        }
+
         else if (std::isalpha(curr))
         {
             std::string word = "";
@@ -100,6 +106,10 @@ std::vector<Token> Lexer::tokenize()
             if (word == "var")
             {
                 tokens.push_back({TokenType::var, "var"});
+            }
+            else if (word == "pow" || word == "abs" || word == "max" || word == "min")
+            {
+                tokens.push_back({TokenType::function, word});
             }
             else
             {

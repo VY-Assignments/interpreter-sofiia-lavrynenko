@@ -67,4 +67,18 @@ class VariableForUseNode : public Node
         ~VariableForUseNode() override = default; 
 };
 
+class FunctionNode : public Node
+{
+    private:
+        std::string _type;
+        std::vector<Node*> _arguments;
+    
+    public:
+        FunctionNode(std::string type, std::vector<Node*> arguments);
+
+        double evaluate(std::map<std::string, double>& userSymbols) override;
+
+        ~FunctionNode() override;
+};
+
 #endif

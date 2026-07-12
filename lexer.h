@@ -16,6 +16,8 @@ enum class TokenType
     assign,
     lparent,
     rparent,
+    function,
+    comma,
     end
 };
 

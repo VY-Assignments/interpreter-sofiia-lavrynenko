@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cmath>
 #include "node.h"
 
 NumberNode::NumberNode(double number)
@@ -97,4 +98,74 @@ double VariableForUseNode::evaluate(std::map<std::string, double>& userSymbols)
     std::cout << "Variable was not found. \n";
 
     return 0;
+}
+
+FunctionNode::FunctionNode(std::string type, std::vector<Node*> arguments)
+{
+    _type = type;
+    _arguments = arguments;
+}
+
+double FunctionNode::evaluate(std::map<std::string, double>& userSymbols)
+{
+    std::vector<double> argumentsValues;
+
+    for(Node* argument : _arguments)
+    {
+        argumentsValues.push_back(argument -> evaluate(userSymbols));
+    }
+
+    if (_type == "pow")
+    {
+        if (argumentsValues.size() != 2)
+        {
+            std::cout << "Function pow expects 2 arguments. \n";
+            return 0;
+        }
+
+        return std::pow(argumentsValues[0], argumentsValues[1]);
+    }
+    else if (_type == "abs")
+    {
+        if (argumentsValues.size() != 1)
+        {
+            std::cout << "Function abs expects 1 arguments. \n";
+            return 0;
+        }
+
+        return std::abs(argumentsValues[0]);
+    }
+    else if (_type == "max")
+    {
+        if (argumentsValues.size() != 2)
+        {
+            std::cout << "Function max expects 2 arguments. \n";
+            return 0;
+        }
+
+        return std::max(argumentsValues[0], argumentsValues[1]);
+    }
+    else if (_type == "min")
+    {
+        if (argumentsValues.size() != 2)
+        {
+            std::cout << "Function min expects 2 arguments. \n";
+            return 0;
+        }
+
+        return std::min(argumentsValues[0], argumentsValues[1]);
+    }
+    else
+    {
+        std::cout << "Unknown function. \n";
+        return 0;
+    }
+}
+
+FunctionNode::~FunctionNode()
+{
+    for (Node* argument : _arguments)
+    {
+        delete argument;
+    }
 }
