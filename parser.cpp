@@ -76,6 +76,15 @@ Node* Parser::parse_user_variables()
 Node* Parser::parse_factor()
 {
     Token curr = peek();
+    
+    if (match(TokenType::minus))
+    {
+        Node* withZero = new NumberNode(0);
+
+        Node* expression = parse_factor();
+
+        return new OperatorNode(withZero, expression, "-");
+    }
 
     if (match(TokenType::number))
     {
@@ -98,6 +107,42 @@ Node* Parser::parse_factor()
     if (match(TokenType::name))
     {
         return new VariableForUseNode(curr.value);
+    }
+
+    if (match(TokenType::function))
+    {
+        std::string functionType = curr.value;
+
+        if (!match(TokenType::lparent))
+        {
+            std::cout << "There must be a '(' after the function name. \n";
+            return nullptr;
+        }
+
+        std::vector<Node*> arguments;
+
+        if (peek().type != TokenType::rparent)
+        {
+            while (true)
+            {
+                arguments.push_back(parse_plus_minus());
+
+                if (match(TokenType::comma))
+                {
+                    continue;
+                }
+
+                break;
+            }
+        }
+
+        if (!match(TokenType::rparent))
+        {
+            std::cout << "There must be a ')' after the function arguments. \n";
+            return nullptr;
+        }
+
+        return new FunctionNode(functionType, arguments);
     }
 
     return nullptr;
