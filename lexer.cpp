@@ -119,7 +119,7 @@ std::vector<Token> Lexer::tokenize()
             {
                 tokens.push_back({TokenType::var, "var"});
             }
-            else if (word == "pow" || word == "abs" || word == "max" || word == "min")
+            else if (word == "pow" || word == "abs" || word == "max" || word == "min" || word == "integral")
             {
                 tokens.push_back({TokenType::function, word});
             }

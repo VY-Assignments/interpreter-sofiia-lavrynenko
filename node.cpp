@@ -100,6 +100,11 @@ double VariableForUseNode::evaluate(std::map<std::string, double>& userSymbols, 
     return 0;
 }
 
+std::string VariableForUseNode::get_name()
+{
+    return _name;
+}
+
 FunctionNode::FunctionNode(std::string type, std::vector<Node*> arguments)
 {
     _type = type;
@@ -108,6 +113,82 @@ FunctionNode::FunctionNode(std::string type, std::vector<Node*> arguments)
 
 double FunctionNode::evaluate(std::map<std::string, double>& userSymbols, std::map<std::string, UserFunction>& userFunctions)
 {
+    if (_type == "integral")
+    {
+        if (_arguments.size() != 3)
+        {
+            std::cout << "Function integral expects 3 arguments. \n";
+            return 0;
+        }
+
+        double a = _arguments[1] -> evaluate(userSymbols, userFunctions);
+        double b = _arguments[2] -> evaluate(userSymbols, userFunctions);
+
+        VariableForUseNode* varN = dynamic_cast<VariableForUseNode*>(_arguments[0]);
+
+        std::string functionN = varN -> get_name();
+        
+        if (userFunctions.find(functionN) == userFunctions.end())
+        {
+            std::cout << "Function wasn't defined. \n";
+            return 0;
+        }
+
+        UserFunction found = userFunctions[functionN];
+
+        if (found.parametersNames.size() != 1)
+        {
+            std::cout << "Found function must have 1 argument. \n";
+            return 0;
+        }
+
+        std::string parameterN = found.parametersNames[0];
+
+        int steps = 1000;
+        double h = (b - a) / steps;
+        double area = 0;
+
+        bool hadParameter = (userSymbols.find(parameterN) != userSymbols.end());
+
+        double prevParameter;
+
+        if (hadParameter)
+        {
+            prevParameter = userSymbols[parameterN];
+        }
+        else
+        {
+            prevParameter = 0;
+        }
+
+        for (int i = 0; i < steps; i++)
+        {
+            double curr = a + i * h;
+            double next = a + (i + 1) * h;
+
+            userSymbols[parameterN] = curr;
+
+            double functionCurr = found.funcBody -> evaluate(userSymbols, userFunctions);
+
+            userSymbols[parameterN] = next;
+
+            double functionNext = found.funcBody -> evaluate(userSymbols, userFunctions);
+
+            area += ((functionCurr + functionNext) / 2.0) * h;
+        }
+
+        if (hadParameter)
+        {
+            userSymbols[parameterN] = prevParameter;
+        }
+        else
+        {
+            userSymbols.erase(parameterN);
+        }
+
+        return round(area);
+    }
+
     std::vector<double> argumentsValues;
 
     for(Node* argument : _arguments)

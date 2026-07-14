@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 class Node;
 
@@ -80,6 +81,7 @@ class VariableForUseNode : public Node
         VariableForUseNode(std::string name);
 
         double evaluate(std::map<std::string, double>& userSymbols, std::map<std::string, UserFunction>& userFunctions) override;
+        std::string get_name();
 
         ~VariableForUseNode() override = default; 
 };
