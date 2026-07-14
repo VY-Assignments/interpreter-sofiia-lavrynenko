@@ -94,6 +94,18 @@ std::vector<Token> Lexer::tokenize()
             move_forward();
         }
 
+        else if (curr == '{')
+        {
+            tokens.push_back({TokenType::lcurl, "{"});
+            move_forward();
+        }
+
+        else if (curr == '}')
+        {
+            tokens.push_back({TokenType::rcurl, "}"});
+            move_forward();
+        }
+
         else if (std::isalpha(curr))
         {
             std::string word = "";
@@ -110,6 +122,10 @@ std::vector<Token> Lexer::tokenize()
             else if (word == "pow" || word == "abs" || word == "max" || word == "min")
             {
                 tokens.push_back({TokenType::function, word});
+            }
+            else if (word == "def")
+            {
+                tokens.push_back({TokenType::def, "def"});
             }
             else
             {

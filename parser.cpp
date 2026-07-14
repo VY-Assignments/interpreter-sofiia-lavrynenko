@@ -70,6 +70,70 @@ Node* Parser::parse_user_variables()
         return new VariableNode(nameT.value, valueExpression);
     }
 
+    if (match(TokenType::def))
+    {
+        Token funcName = peek();
+
+        if (!match(TokenType::name))
+        {
+            std::cout << "You need to give a name for the function. \n";
+            return nullptr;
+        }
+
+        if (!match(TokenType::lparent))
+        {
+            std::cout << "You need to type a '(' after the name. \n";
+            return nullptr;
+        }
+
+        std::vector<std::string> parametersNames;
+
+        if (peek().type != TokenType::rparent)
+        {
+            while(true)
+            {
+                Token parameter = peek();
+
+                if (!match(TokenType::name))
+                {
+                    std::cout << "You need to type a name for the parameter. \n";
+                    return nullptr;
+                }
+
+                parametersNames.push_back(parameter.value);
+
+                if (match(TokenType::comma))
+                {
+                    continue;
+                }
+
+                break;
+            }
+        }
+
+        if (!match(TokenType::rparent))
+        {
+            std::cout << "You need to type a ')' after the parameters. \n";
+            return nullptr;
+        }
+
+        if (!match(TokenType::lcurl))
+        {
+            std::cout << "You need to type a '{'. \n";
+            return nullptr;
+        }
+
+        Node* body = parse_plus_minus();
+
+        if (!match(TokenType::rcurl))
+        {
+            std::cout << "You need to type a '}'. \n";
+            return nullptr;
+        }
+
+        return new DefFunctionNode(funcName.value, parametersNames, body);
+    }
+
     return parse_plus_minus();
 }
 
@@ -106,6 +170,36 @@ Node* Parser::parse_factor()
 
     if (match(TokenType::name))
     {
+        std::string name = curr.value;
+
+        if (match(TokenType::lparent))
+        {
+            std::vector<Node*> arguments;
+
+            if (peek().type != TokenType::rparent)
+            {
+                while (true)
+                {
+                    arguments.push_back(parse_plus_minus());
+                    
+                    if (match(TokenType::comma))
+                    {
+                        continue;
+                    }
+
+                    break;
+                }
+            }
+
+            if (!match(TokenType::rparent))
+            {
+                std::cout << "You need to type a ')' after the parameters. \n";
+                return nullptr;
+            }
+
+            return new DefFunctionCallNode(name, arguments);
+        }
+
         return new VariableForUseNode(curr.value);
     }
 

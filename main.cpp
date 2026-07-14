@@ -10,6 +10,7 @@
 int main()
 {
     std::map<std::string, double> userSymbols;
+    std::map<std::string, UserFunction> userFunctions;
 
     std::string input;
 
@@ -36,7 +37,7 @@ int main()
 
         if (root != nullptr)
         {
-            double res = root -> evaluate(userSymbols);
+            double res = root -> evaluate(userSymbols, userFunctions);
             std::cout << "Your result: " << res << "\n";
 
             delete root;

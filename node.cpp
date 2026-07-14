@@ -8,7 +8,7 @@ NumberNode::NumberNode(double number)
     _number = number;
 }
 
-double NumberNode::evaluate(std::map<std::string, double>& userSymbols)
+double NumberNode::evaluate(std::map<std::string, double>& userSymbols, std::map<std::string, UserFunction>& userFunctions)
 {
     return _number;
 }
@@ -22,10 +22,10 @@ OperatorNode::OperatorNode(Node* one, Node* two, std::string oper)
     _operator = oper;
 }
 
-double OperatorNode::evaluate(std::map<std::string, double>& userSymbols)
+double OperatorNode::evaluate(std::map<std::string, double>& userSymbols, std::map<std::string, UserFunction>& userFunctions)
 {
-    double oneValue = _one -> evaluate(userSymbols);
-    double twoValue = _two -> evaluate(userSymbols);
+    double oneValue = _one -> evaluate(userSymbols, userFunctions);
+    double twoValue = _two -> evaluate(userSymbols, userFunctions);
 
     if (_operator == "+")
     {
@@ -65,7 +65,7 @@ VariableNode::VariableNode(std::string name, Node* valueExpression)
     _valueExpression = valueExpression;
 }
 
-double VariableNode::evaluate(std::map<std::string, double>& userSymbols)
+double VariableNode::evaluate(std::map<std::string, double>& userSymbols, std::map<std::string, UserFunction>& userFunctions)
 {
     if (userSymbols.find(_name) != userSymbols.end())
     {
@@ -73,7 +73,7 @@ double VariableNode::evaluate(std::map<std::string, double>& userSymbols)
         return userSymbols[_name];
     }
     
-    double val = _valueExpression -> evaluate(userSymbols);
+    double val = _valueExpression -> evaluate(userSymbols, userFunctions);
     userSymbols[_name] = val;
     return val;
 }
@@ -88,7 +88,7 @@ VariableForUseNode::VariableForUseNode(std::string name)
     _name = name;
 }
 
-double VariableForUseNode::evaluate(std::map<std::string, double>& userSymbols)
+double VariableForUseNode::evaluate(std::map<std::string, double>& userSymbols, std::map<std::string, UserFunction>& userFunctions)
 {
     if (userSymbols.find(_name) != userSymbols.end())
     {
@@ -106,13 +106,13 @@ FunctionNode::FunctionNode(std::string type, std::vector<Node*> arguments)
     _arguments = arguments;
 }
 
-double FunctionNode::evaluate(std::map<std::string, double>& userSymbols)
+double FunctionNode::evaluate(std::map<std::string, double>& userSymbols, std::map<std::string, UserFunction>& userFunctions)
 {
     std::vector<double> argumentsValues;
 
     for(Node* argument : _arguments)
     {
-        argumentsValues.push_back(argument -> evaluate(userSymbols));
+        argumentsValues.push_back(argument -> evaluate(userSymbols, userFunctions));
     }
 
     if (_type == "pow")
@@ -165,6 +165,99 @@ double FunctionNode::evaluate(std::map<std::string, double>& userSymbols)
 FunctionNode::~FunctionNode()
 {
     for (Node* argument : _arguments)
+    {
+        delete argument;
+    }
+}
+
+DefFunctionNode::DefFunctionNode(std::string name, std::vector<std::string> parametersNames, Node* funcBody)
+{
+    _name = name;
+    _parametersNames = parametersNames;
+    _funcBody = funcBody;
+}
+
+double DefFunctionNode::evaluate(std::map<std::string, double>& userSymbols, std::map<std::string, UserFunction>& userFunctions)
+{
+    if (userFunctions.find(_name) != userFunctions.end())
+    {
+        delete userFunctions[_name].funcBody;
+    }
+
+    userFunctions[_name] = {_parametersNames, _funcBody};
+
+    return 0;
+}
+
+DefFunctionNode::~DefFunctionNode() {}
+
+DefFunctionCallNode::DefFunctionCallNode(std::string name, std::vector<Node*> arguments)
+{
+    _name = name;
+    _arguments = arguments;
+}
+
+double DefFunctionCallNode::evaluate(std::map<std::string, double>& userSymbols, std::map<std::string, UserFunction>& userFunctions)
+{
+    if (userFunctions.find(_name) == userFunctions.end())
+    {
+        std::cout << "Function wasn't found. \n";
+        return 0;
+    }
+
+    UserFunction function = userFunctions[_name];
+
+    if (_arguments.size() != function.parametersNames.size())
+    {
+        std::cout << "Wrong parameters amount. \n";
+        return 0;
+    }
+
+    std::vector<double> evaluated;
+
+    for (Node* argument : _arguments)
+    {
+        evaluated.push_back(argument -> evaluate(userSymbols, userFunctions));
+    }
+
+    std::map<std::string, double> oldV;
+    std::vector<std::string> erase;
+
+    for (int i = 0; i < function.parametersNames.size(); i++)
+    {
+        std::string paramN = function.parametersNames[i];
+
+        if (userSymbols.find(paramN) != userSymbols.end())
+        {
+            oldV[paramN] = userSymbols[paramN];
+        }
+        else
+        {
+            erase.push_back(paramN);
+        }
+
+
+        userSymbols[paramN] = evaluated[i];
+    }
+
+    double res = function.funcBody -> evaluate(userSymbols, userFunctions);
+
+    for (auto& pair : oldV)
+    {
+        userSymbols[pair.first] = pair.second;
+    }
+
+    for (std::string& name : erase)
+    {
+        userSymbols.erase(name);
+    }
+
+    return res;
+}
+
+DefFunctionCallNode::~DefFunctionCallNode()
+{
+    for (Node* argument: _arguments)
     {
         delete argument;
     }

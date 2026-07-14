@@ -18,6 +18,9 @@ enum class TokenType
     rparent,
     function,
     comma,
+    def,
+    lcurl,
+    rcurl,
     end
 };
 
